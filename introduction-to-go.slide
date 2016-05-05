@@ -1,0 +1,353 @@
+Introduction to Google's Go
+Stratio / Datio (May 2016)
+
+
+Mario Castro
+Gopher @ StratioBD
+@110010111101011
+mcastro@stratio.com
+
+* When and who...
+
+* History
+Design began in late 2007.
+
+- Robert Griesemer, Rob Pike, and Ken Thompson.
+- Ian Lance Taylor and Russ Cox.
+- Open source since 2009 with a very active community.
+- Language stable as of Go 1, early 2012.
+
+
+* Who's Go
+The men behind it...
+
+- Ken Thompson
+  - Ex Bell labs, Unix designer, B programming language
+- Rob Pike
+  - Ex Bell labs, Unix Team, Inferno, Plan 9, UTF-8
+- Robert Griesmer
+  - V8 (Chrome engine)
+
+* Why a new language
+
+* Why a new language
+- slow builds
+- uncontrolled dependencies
+- poor program understanding (code hard to read, poorly documented...)
+- Computers are enormously quicker but software development is not faster.
+- Some fundamental concepts such as garbage collection and parallel computation are not well supported by popular systems languages.
+
+
+* What's Go (as a programming language)
+- Statically typed (duck typing)
+- Compiled language (no more virtual machines... thanks...)
+- Structure oriented (no inheritance)
+- Concise and simple syntax, easy to get started with
+- Good facilities for writing concurrent programs that share state by communicating
+- Unified formatting style for the language
+- Compilation is fast even with large projects
+- No need to know a new paradigm or awkward syntax
+
+
+* Comparing Go and Java
+
+
+
+* Go and Java have much in common
+.image files/go_and_java.jpg
+
+
+* Go and Java have much in common
+- C family (imperative, braces)
+- Statically typed
+- Garbage collected
+- Methods
+- Interfaces
+- Type assertions (`instanceof`)
+- Reflection
+
+
+* Go and Java have much in common
+.image files/keep_using_java.jpg 500 _
+
+
+* Go differs from Java in several ways
+- Programs compile to machine code.  There's no VM.
+- Statically linked binaries
+- Built-in strings (UTF-8)
+- Built-in generic maps and arrays/slices
+- Built-in concurrency
+
+
+* Go intentionally leaves out many features
+- No classes
+- No constructors
+- No inheritance
+- *No* *user-defined* *generics*
+
+No `final`, exceptions, annotations...
+
+* Go intentionally leaves out many features
+.image files/no_generics.jpg
+
+* Seriously...
+
+No, there are not generics nor algebraic types, monads...
+.image files/hate.jpg
+
+
+* Why does Go leave out those features?
+
+- Clarity is critical.
+- When reading code, it should be clear what the program will do.
+- When writing code, it should be clear how to make the program do what you want.
+- Sometimes this means writing out a loop instead of invoking an obscure function.
+
+* So, Go is not...
+- ...a functional language
+- ...a new fancy way of coding
+- ...a completely open-source project (no pull-requests)
+- ...a super language that will replace us
+- ...talking about replacement... is not the replacement of Java... or C++... or Cobol...
+
+
+* Why Go
+- Make programming fast
+- Safety: type-safe and memory-safe
+- Efficient gargage collector
+- Reduce typing. No more:
+  foo.Foo *myFoo = new foo.Foo(foo.FOO_INIT)
+- Focus on productivity and concurrency of distributed systems with CSP concurrency model
+.image files/garbage.jpg 220 _
+
+* Concurrency
+.image files/what_do_you_mean_with_csp.jpg
+
+* Concurrency
+- *Actor* model: Entities passing messages to each other that are queued (Erlang, Scala, Java...)
+- *CSP* (Communicating sequential processes) model. Proccesses passing messages to channels that blocks until the messages are taken but with possibility of using queues
+CSP represents the best known way to write software and organize services together to form a system. Nature itself provides the best examples; even the human body is a system of interconnected services — respiratory, cardiovascular, nervous, immune, etc.
+.caption The Tao of Hashicorp [[https://www.hashicorp.com/blog/tao-of-hashicorp.html][https://www.hashicorp.com/blog/tao-of-hashicorp.html]]
+
+
+*
+.image files/shut_up.jpg
+
+* Hello World
+.play files/hello_world.go
+
+* Hello world
+.image files/no_hello_world.jpg
+
+* Hello web-server
+.play files/server.go
+
+* Classes vs Structs. Interfaces vs... Interfaces?
+.html files/java_vs_go.html
+
+* Inferred types
+- No need to write variables types
+.play files/inferred.go
+.image files/kerbal.png _ 200
+
+* Testing
+- Comes with its own test suite
+  $ go test .
+  $ ok  	github.com/thehivecorporation/raccoon/parser	0.003s
+- Getting output...
+  $ go test -v .
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/i-do-not-exist
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/wrongJson819901235
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=../examples/exampleBook.json
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/no-content618452726
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/incorrect-keys225742813
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/incorrect-keys139921816
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/incorrect-keys017622039
+  $ INFO[0000] ------------------------------> Reading zombiebook file  zombiebook=/tmp/incorrect-keys215240842
+  $ --- PASS: TestReadZbookFile (0.00s)
+  $ 	zbook_test.go:18: Error reading zombiebook file: open /tmp/i-do-not-exist: no such file or directory
+  $ 	zbook_test.go:32: Error parsing JSON: invalid character 'w' looking for beginning of object key string
+  $ PASS
+  $ ok  	github.com/thehivecorporation/raccoon/parser	0.003s
+
+* Testing
+.image files/race_detector.jpg 500 _
+
+* Testing
+- Race condition evaluation integrated
+  $ go test -race .
+  $ ok  	github.com/thehivecorporation/raccoon/parser	1.013s
+- Comes with its own coverage support
+  $ go test -race -cover .
+  $ ok  	github.com/thehivecorporation/raccoon/parser	1.011s	coverage: 68.3% of statements
+
+* Other tools
+
+
+* gofmt
+- `gofmt` formats indentation, spaces, newlines and syntax
+- Makes most code familiar.
+.image files/all_code.jpg 400 _
+
+
+* golint
+- `golint` warns you about good practices and suggestions
+- Example:
+.code files/linter.go /^type/,/^}/
+  linter.go:3:6: exported type Executor should have comment or be unexported
+- Ok so...
+.code files/linter2.go /execution/,/^}/
+  linter2.go:3:1: comment on exported type Executor should be of the form "Executor ..." (with optional leading article)
+.code files/linter3.go /strategy/,/^}/
+
+* golint
+.image files/comments.jpg 550 _
+
+* golint
+- If the name always begins the comment, the output of godoc can usefully be run through grep. Imagine you couldn't remember the name "Compile" but were looking for the parsing function for regular expressions, so you ran the command,
+  $ godoc regexp | grep parse
+    Compile parses a regular expression and returns, if successful, a Regexp
+    parsed. It simplifies safe initialization of global variables holding
+    cannot be parsed. It simplifies safe initialization of global variables
+  $
+.image files/i_won.jpg 250 _
+.caption Found in [[https://golang.org/doc/effective_go.html#commentary]["Effective Go"]]
+
+* GoDoc
+- All core packages at your fingertips
+- You can perform queries in command line
+- Or open a web server to search
+  godoc index=true -http=:6060
+- Search in a specific package
+  godoc fmt | grep -i read
+  func Fscanln(r io.Reader, a ...interface{}) (n int, err error)
+      Scan scans text read from standard input, storing successive
+      Scanf scans text read from standard input, storing successive
+      // ReadRune reads the next rune (Unicode code point) from the input.
+      // If invoked during Scanln, Fscanln, or Sscanln, ReadRune() will
+      // return EOF after returning the first '\n' or when reading beyond
+      ReadRune() (r rune, size int, err error)
+      // UnreadRune causes the next call to ReadRune to return the same rune.
+      UnreadRune() error
+      // Because ReadRune is implemented by the interface, Read should never be
+      // ScanState may choose always to return an error from Read.
+      Read(buf []byte) (n int, err error)
+
+
+* Go Get
+- Useful for dependency management
+- As simple as
+  $ go get github.com/kubernetes/kubernetes
+
+  import "github.com/4ad/doozer"
+
+  var client doozer.Conn
+- Actually, most IDE's has an auto-import (or auto-import on save) so the import step is not necessary.
+
+* Go Get
+.image files/maven.jpg
+
+* Go Get
+.image files/no_maven.jpg
+
+* Coding features and patterns
+- More than one object on return (error always at the end)
+  func myFunc() (struct1, struct2, error)
+
+* Coding features and patterns
+- Delegate error pattern
+  return nil, err       //Error ocurred, delegate to caller
+
+  return o, nil         //No error
+
+* Coding features and patterns
+- Pointers and references
+  o := myObject{}               //"o" is an object
+
+  doSomething(&o)               //Passing a pointer. "o" is still an object
+
+  o := &myObject{}              //Pointer to object. "o" is a pointer
+
+  func useObject(o *myObject)   //A received pointer "o" is a pointer
+
+* An opinionated language
+Can be weird at the beginning
+
+- No brackets in new line
+- Uppercase for public, lowercase for private
+- Comments of public methods must start with the name of the method
+
+
+* Workflow
+
+* The workspace
+Is defined as an environment variable callde $GOPATH.
+
+  $ export GOPATH=${HOME}/go
+
+So a `go get` of `github.com/docker/docker` will put the source in
+
+  $ go get github.com/docker/docker
+  $ cd $GOPATH/src/github.com/docker/docker
+
+Easy, uh?
+
+* Import system
+Uses the path in your $GOPATH just after the src
+
+
+* Contributing in Github
+
+- Don't clone your fork! Use `go get` of the original project
+- Use your fork to upload your branch and open the pull request
+
+* Part of Tens
+No inheritance
+Strongly typed
+Focus on productivity
+Strongly opinionated
+No generics
+Has pointers and references
+No unused variables nor imports
+Strings and structs can’t be nil
+Zero allocation
+App exists with active goroutines
+You must work always in $GOPATH
+No “git clone”. Use “go get”
+No need of testing frameworks
+
+
+
+* IDE's
+- Intellij Idea (has debugging support already. Thanks Abel!)
+- Atom (Has debugging support using Delve plugin)
+- Sublime Text
+- Eclipse
+- LiteIde
+
+* Companies using Go
+- Google
+- Docker
+- Netflix
+- Parse
+- Digital Ocean
+- Ebay
+- AirBnB
+- Dropbox
+- Uber
+- VMWare
+
+* Famous software written in Go
+- Docker
+- Kubernetes (Google)
+- Hashicorp's stack (Consul, Terraform, Vault, Serf, Otto, Nomad, Packer)
+- Prometheus (SoundClound)
+- CoreOS stack (ETCD, Fleet, Rkt, Flannel)
+- InfluxDB
+- Grafana
+
+* By the way
+
+* This presentation...
+
+  ...is also done with a Go tool
