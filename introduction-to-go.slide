@@ -52,7 +52,6 @@ The men behind it...
 * Comparing Go and Java
 
 
-
 * Go and Java have much in common
 .image files/go_and_java.jpg
 
@@ -65,6 +64,9 @@ The men behind it...
 - Interfaces
 - Type assertions (`instanceof`)
 - Reflection
+
+* Classes vs Structs. Interfaces vs... Interfaces?
+.html files/java_vs_go.html
 
 
 * Go and Java have much in common
@@ -99,6 +101,13 @@ No, there are not generics nor algebraic types, monads...
 * Why does Go leave out those features?
 
 - Clarity is critical.
+  class Foo[F[+_] : Monad, A, B](val execute: Foo.Request[A] => F[B], val joins: Foo.Request[A] => B => List[Foo.Request[A]])(implicit J: Foo.Join[A, B]) {
+
+  def bar: Foo[({type l[+a]=WriterT[F, Log[A, B], a]})#l, A, B] = {
+      type TraceW[FF[+_], +AA] = WriterT[FF, Log[A, B], AA]
+      def execute(request: Request[A]): WriterT[F, Log[A, B], B] =
+        self.execute(request).liftM[TraceW] :++>> (repr => List(request -> request.response(repr, self.joins(request)(repr))))
+
 - When reading code, it should be clear what the program will do.
 - When writing code, it should be clear how to make the program do what you want.
 - Sometimes this means writing out a loop instead of invoking an obscure function.
@@ -112,6 +121,9 @@ No, there are not generics nor algebraic types, monads...
 
 
 * Why Go
+
+
+* Why Go
 - Make programming fast
 - Safety: type-safe and memory-safe
 - Efficient gargage collector
@@ -120,18 +132,40 @@ No, there are not generics nor algebraic types, monads...
 - Focus on productivity and concurrency of distributed systems with CSP concurrency model
 .image files/garbage.jpg 220 _
 
-* Concurrency
+* CSP Concurrency
 .image files/what_do_you_mean_with_csp.jpg
 
-* Concurrency
+* CSP Concurrency
 - *Actor* model: Entities passing messages to each other that are queued (Erlang, Scala, Java...)
 - *CSP* (Communicating sequential processes) model. Proccesses passing messages to channels that blocks until the messages are taken but with possibility of using queues
 CSP represents the best known way to write software and organize services together to form a system. Nature itself provides the best examples; even the human body is a system of interconnected services — respiratory, cardiovascular, nervous, immune, etc.
 .caption The Tao of Hashicorp [[https://www.hashicorp.com/blog/tao-of-hashicorp.html][https://www.hashicorp.com/blog/tao-of-hashicorp.html]]
+- This was my face when I read the Tao of Hashicorp...
 
+* CSP Concurrency
+.image files/fan_in.jpg _ 700
+- "Gophers" = processes
+- Arrows = channels
+- One "Gopher" could listen to zero or more channels
+- One "Gopher" can send messages to zero or more channels
 
-*
+* An opinionated language
+Can be weird at the beginning
+
+- No brackets in new line (formatter will put them up again)
+- An Uppercase name means that some method or variable is public, lowercase for private
+- Comments of public methods must start with the name of the method
+- Your project must reside within $GOPATH
+- Parameters in the definition of a function must be one character
+- If you return more than one value, last must be an error
+- No more than one file with "package main" even if you only have one "main" function (just works with `go build` but not with `go run [file]`)
+- Imports points to some kind of URL that must match a path within your $GOPATH
+
+* An opinionated language
 .image files/shut_up.jpg
+
+* Hello World
+
 
 * Hello World
 .play files/hello_world.go
@@ -142,13 +176,51 @@ CSP represents the best known way to write software and organize services togeth
 * Hello web-server
 .play files/server.go
 
-* Classes vs Structs. Interfaces vs... Interfaces?
-.html files/java_vs_go.html
+* More examples: Native Unix piping
+.play files/pipe/pipe.go /func/,/^}/
 
 * Inferred types
 - No need to write variables types
 .play files/inferred.go
 .image files/kerbal.png _ 200
+
+
+* Some common coding features and patterns
+- More than one object on return (error always at the end)
+  func myFunc() (struct1, struct2, error)
+
+- Delegate error pattern
+  return nil, err       //Error ocurred, delegate to caller
+
+  return o, nil         //No error
+
+- Pointers and references
+  o := myObject{}               //"o" is an object
+
+  doSomething(&o)               //Passing a pointer. "o" is still an object
+
+  o := &myObject{}              //Pointer to object. "o" is a pointer
+
+  func useObject(o *myObject)   //A received pointer "o" is a pointer
+
+* Some commong coding features and patterns
+- Handle every error
+  if err != nil {
+    log.Fatal(err)
+  }
+
+- Ignore a returned variable (very bad practice, don't trust code that do this)
+  myobj, _ := myFuncThatReturnsAnObjectAndAnError()
+
+- Return anything (quite common in Consul code)
+  func myFunc() interface{}
+
+- Do some type assertion
+  obj := myFunc()
+  myString, ok := obj.(string)
+  if ok {
+    println(myString)
+  }
 
 * Testing
 - Comes with its own test suite
@@ -238,91 +310,102 @@ CSP represents the best known way to write software and organize services togeth
 - Useful for dependency management
 - As simple as
   $ go get github.com/kubernetes/kubernetes
-
   import "github.com/4ad/doozer"
-
   var client doozer.Conn
-- Actually, most IDE's has an auto-import (or auto-import on save) so the import step is not necessary.
-
-* Go Get
-.image files/maven.jpg
-
-* Go Get
-.image files/no_maven.jpg
-
-* Coding features and patterns
-- More than one object on return (error always at the end)
-  func myFunc() (struct1, struct2, error)
-
-* Coding features and patterns
-- Delegate error pattern
-  return nil, err       //Error ocurred, delegate to caller
-
-  return o, nil         //No error
-
-* Coding features and patterns
-- Pointers and references
-  o := myObject{}               //"o" is an object
-
-  doSomething(&o)               //Passing a pointer. "o" is still an object
-
-  o := &myObject{}              //Pointer to object. "o" is a pointer
-
-  func useObject(o *myObject)   //A received pointer "o" is a pointer
-
-* An opinionated language
-Can be weird at the beginning
-
-- No brackets in new line
-- Uppercase for public, lowercase for private
-- Comments of public methods must start with the name of the method
-
+- Most IDE's has an auto-import (on save) features
+.image files/go_get.jpg _ 400
 
 * Workflow
 
+* Workflow
+.image files/typing.gif
+
+* Installing Go
+From repositories
+- Ubuntu users: `sudo apt-get install -y golang`
+- Centos/RHEL users: `sudo yum install -y golang`
+- Fedora: `sudo dnf install -y golang`
+
+* Installing Go
+.image files/thank_you.gif
+
+
+* Ok... the slightly harder one: Installing Go
+Latest build
+.link http://golang.org golang.org
+- Select your distro
+- unpack it `tar -zxvf go1.6.2.linux-amd64.tar.gz`
+- Move the `go` folder to your favorite destination (assign permissions according to destination)
+- Add a $GOROOT environment variable pointing to your go folder (*not* *the* *bin* *folder* *within* *your* *go* *folder*) to /etc/profile, ${HOME}/.bashrc, etc.
+- Add a $GOPATH environment variable pointing to an empty folder that will represent your global workspace for Go
+
+
 * The workspace
-Is defined as an environment variable callde $GOPATH.
+Workspace is global and it's defined as an environment variable called $GOPATH.
 
   $ export GOPATH=${HOME}/go
 
-So a `go get` of `github.com/docker/docker` will put the source in
+So a `go get github.com/docker/docker` will put the source in
 
   $ go get github.com/docker/docker
   $ cd $GOPATH/src/github.com/docker/docker
 
 Easy, uh?
 
-* Import system
-Uses the path in your $GOPATH just after the src
+* Our first Go App
+.play files/first/main.go
+
+* Our second Go App
+.code -numbers files/second/main.go
+
+* Our third Go App
+.code -numbers files/third/main.go
+
+* Our fourth Go App
+.code -numbers files/fourth/main.go /^func/,/END/
+
+* Our fifth Go App
+.code -numbers files/fifth/main.go /^var/,/END/
+
+* Our sixth...
+.image files/stop_it.gif
 
 
 * Contributing in Github
+Workflow is slightly different
 
-- Don't clone your fork! Use `go get` of the original project
-- Use your fork to upload your branch and open the pull request
+- Fork the project into your own github account
+- *Don't* *clone* *your* *fork!* Use `go get` of the original git project
+- As mentioned earlier, it will create a folder within your `$GOPATH/src/[project_owner]/[repo]`
+- Add your fork as a differente remote (`git remote add my_fork https://github.com/[my_account]/[my_fork]`)
+- Work as usual
+- Push your changes to your fork
+- Open pull request as usual
+(At least, this is how I do it)
 
 * Part of Tens
-No inheritance
-Strongly typed
-Focus on productivity
-Strongly opinionated
-No generics
-Has pointers and references
-No unused variables nor imports
-Strings and structs can’t be nil
-Zero allocation
-App exists with active goroutines
-You must work always in $GOPATH
-No “git clone”. Use “go get”
-No need of testing frameworks
+01 No inheritance
+02 Strongly typed
+03 No “git clone”. Use “go get”
+04 Strongly opinionated
+05 No generics
+06 Has pointers and references
+07 No unused variables nor imports
+08 Strings and structs can’t be nil
+09 You must work always in $GOPATH
+10 No need of locks or semaphores with channels
+
+* Part of Tens
 
 
 
-* IDE's
+* IDE's and other editing tools
+- vim + vim-go
+- emacs + go-model.el
 - Intellij Idea (has debugging support already. Thanks Abel!)
-- Atom (Has debugging support using Delve plugin)
-- Sublime Text
-- Eclipse
+- Atom + go-plus (Has debugging support using Delve plugin)
+- Sublime Text + GoSublime
+- Visual Studio Code + vscode-go
 - LiteIde
 
 * Companies using Go
@@ -346,8 +429,27 @@ No need of testing frameworks
 - InfluxDB
 - Grafana
 
+* Best resources to learn Go (ordered)
+- A Tour of Go (interactive tutorial)
+.link https://tour.golang.org/list https://tour.golang.org/list
+- Go By Example
+.link https://gobyexample.com/ https://gobyexample.com/
+- How to install Go workspace
+.link https://golang.org/doc/code.html https://golang.org/doc/code.html
+- Go bootcamp (free ebook)
+.link http://www.golangbootcamp.com/ http://www.golangbootcamp.com/
+- "Effective Go" Wait a week or two to read
+.link https://golang.org/doc/effective_go.html https://golang.org/doc/effective_go.html
+
+* Other references
+- Docker and Go: Why we decide to write Docker in Go?
+.link http://www.slideshare.net/jpetazzo/docker-and-go-why-did-we-decide-to-write-docker-in-go http://www.slideshare.net/jpetazzo/docker-and-go-why-did-we-decide-to-write-docker-in-go
+- Moving a Team from Scala to Golang
+.link http://jimplush.com/talk/2015/12/19/moving-a-team-from-scala-to-golang/ http://jimplush.com/talk/2015/12/19/moving-a-team-from-scala-to-golang/
+
+
 * By the way
 
 * This presentation...
 
-  ...is also done with a Go tool
+ ...is also done with a Go tool
