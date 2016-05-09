@@ -5,7 +5,22 @@ Stratio / Datio (May 2016)
 Mario Castro
 Gopher @ StratioBD
 @110010111101011
+github.com/sayden
 mcastro@stratio.com
+
+* For those who don’t know me…
+
+* For those who don’t know me…
+- *Mario* *Castro*
+- DevOps @ Stratio
+- Started coding with 13 yo
+- Java (J++) since 2000
+- PHP, Python, Java Android, Objective-C, Node.js
+- Pixar's Certified in Renderman's render engine
+- Other scripting languages (MEL, HScript)
+
+* Let's Go
+.image files/bg.jpg
 
 * When and who...
 
@@ -16,17 +31,16 @@ Design began in late 2007.
 - Ian Lance Taylor and Russ Cox.
 - Open source since 2009 with a very active community.
 - Language stable as of Go 1, early 2012.
+.image files/history.png _ 250
 
 
 * Who's Go
 The men behind it...
 
-- Ken Thompson
-  - Ex Bell labs, Unix designer, B programming language
-- Rob Pike
-  - Ex Bell labs, Unix Team, Inferno, Plan 9, UTF-8
-- Robert Griesmer
-  - V8 (Chrome engine)
+- Ken Thompson (Ex Bell labs, Unix designer, B programming language)
+- Rob Pike (Ex Bell labs, Unix Team, Inferno, Plan 9, UTF-8)
+- Robert Griesemer (V8 Chrome engine, Sawzall)
+.html files/who.html
 
 * Why a new language
 
@@ -36,6 +50,7 @@ The men behind it...
 - poor program understanding (code hard to read, poorly documented...)
 - Computers are enormously quicker but software development is not faster.
 - Some fundamental concepts such as garbage collection and parallel computation are not well supported by popular systems languages.
+.image files/why_a_new_language.jpg _ 500
 
 
 * What's Go (as a programming language)
@@ -71,6 +86,12 @@ The men behind it...
 
 * Go and Java have much in common
 .image files/keep_using_java.jpg 500 _
+
+
+* This is not a competition
+- Go is not trying to replace Java
+- Go has focus on productivity and consolidating Google's experience in large distributed systems
+- Google uses Java, Javascript, C++, Python, Go, Sawzal and probably a few other languages are supported (Jeff Nelson, inventor of Chrome OS)
 
 
 * Go differs from Java in several ways
@@ -119,10 +140,6 @@ No, there are not generics nor algebraic types, monads...
 - ...a super language that will replace us
 - ...talking about replacement... is not the replacement of Java... or C++... or Cobol...
 
-
-* Why Go
-
-
 * Why Go
 - Make programming fast
 - Safety: type-safe and memory-safe
@@ -142,12 +159,23 @@ CSP represents the best known way to write software and organize services togeth
 .caption The Tao of Hashicorp [[https://www.hashicorp.com/blog/tao-of-hashicorp.html][https://www.hashicorp.com/blog/tao-of-hashicorp.html]]
 - This was my face when I read the Tao of Hashicorp...
 
+
 * CSP Concurrency
 .image files/fan_in.jpg _ 700
 - "Gophers" = processes
 - Arrows = channels
 - One "Gopher" could listen to zero or more channels
 - One "Gopher" can send messages to zero or more channels
+
+* CSP Concurrency
+- Process are anonymous (you can just reach them using a channel)
+- Channels can be buffered or unbeffered
+- Channels can be bi-directional or uni-directional
+- More than one proccess could be listening the same channel
+- One process could listen more than one channel
+- More about this in the workshop
+
+* An opinionated language
 
 * An opinionated language
 Can be weird at the beginning
@@ -313,7 +341,7 @@ Can be weird at the beginning
   import "github.com/4ad/doozer"
   var client doozer.Conn
 - Most IDE's has an auto-import (on save) features
-.image files/go_get.jpg _ 400
+.image files/go_get.jpg _ 250
 
 * Workflow
 
@@ -338,6 +366,7 @@ Latest build
 - Move the `go` folder to your favorite destination (assign permissions according to destination)
 - Add a $GOROOT environment variable pointing to your go folder (*not* *the* *bin* *folder* *within* *your* *go* *folder*) to /etc/profile, ${HOME}/.bashrc, etc.
 - Add a $GOPATH environment variable pointing to an empty folder that will represent your global workspace for Go
+- Add $GOPATH/bin and $GOROOT/bin to your $PATH
 
 
 * The workspace
@@ -384,20 +413,16 @@ Workflow is slightly different
 (At least, this is how I do it)
 
 * Part of Tens
-01 No inheritance
-02 Strongly typed
-03 No “git clone”. Use “go get”
-04 Strongly opinionated
-05 No generics
-06 Has pointers and references
-07 No unused variables nor imports
-08 Strings and structs can’t be nil
-09 You must work always in $GOPATH
-10 No need of locks or semaphores with channels
-
-* Part of Tens
-
-
+- No inheritance
+- Strongly typed
+- No “git clone”. Use “go get”
+- Strongly opinionated
+- No generics
+- Has pointers and references
+- No unused variables nor imports
+- Strings and structs can’t be nil
+- You must work always in $GOPATH
+- No need of locks or semaphores with channels
 
 * IDE's and other editing tools
 - vim + vim-go
@@ -444,8 +469,6 @@ Workflow is slightly different
 * Other references
 - Docker and Go: Why we decide to write Docker in Go?
 .link http://www.slideshare.net/jpetazzo/docker-and-go-why-did-we-decide-to-write-docker-in-go http://www.slideshare.net/jpetazzo/docker-and-go-why-did-we-decide-to-write-docker-in-go
-- Moving a Team from Scala to Golang
-.link http://jimplush.com/talk/2015/12/19/moving-a-team-from-scala-to-golang/ http://jimplush.com/talk/2015/12/19/moving-a-team-from-scala-to-golang/
 
 
 * By the way
@@ -453,3 +476,5 @@ Workflow is slightly different
 * This presentation...
 
  ...is also done with a Go tool
+
+* Questions?

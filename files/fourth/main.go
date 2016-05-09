@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	workersCh := make(chan int)
+	workersCh := make(chan int, 20)
 	for i := 0; i < 20; i++ {
 		go worker(i, workersCh)
 	}

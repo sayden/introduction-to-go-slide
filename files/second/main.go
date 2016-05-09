@@ -7,8 +7,6 @@ func main() {
 
 	go World()
 
-	var input string
-	fmt.Scanln(&input)
 }
 
 func World() {
